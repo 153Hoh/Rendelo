@@ -1,24 +1,23 @@
 
+import javafx.stage.FileChooser;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GUI {
+public class GUI extends Component {
     private JPanel MainPanel;
-    private JButton megtek;
+    private JButton AddDataBase;
     private JPanel TablePanel;
     private JPanel GombPanel;
     private JButton search;
@@ -30,15 +29,6 @@ public class GUI {
     private JPanel BefPanel;
     private JPanel Gomb2Panel;
     private JPanel BefTablePanel;
-    private JPanel DataBaseAddPanel;
-    private JPanel GombPanel3;
-    private JButton visszaButton;
-    private JButton DataBaseAddBut;
-    private JPanel twoInPanel;
-    private JPanel twoInLeftPanel;
-    private JLabel hozLab;
-    private JPanel twoInMidPanel;
-    private JPanel twoInRightPanel;
     private JTable table;
     private JTable befTable;
     private List<Data> data;
@@ -51,8 +41,7 @@ public class GUI {
     private String baseDataPath;
     private HibaShow hibaShow;
     private DoubleClickListener dcl = new DoubleClickListener();
-
-    // TODO: Normálisra megcsinálni az adatbázis hozzáadást [OPEN]
+    final JFileChooser fc;
 
     private GUI() {
         $$$setupUI$$$();
@@ -62,6 +51,7 @@ public class GUI {
         keresztur = new ArrayList<>();
         data = new ArrayList<>();
         hibaShow = new HibaShow(hibaText);
+        fc = new JFileChooser();
 
         TablePanel.setVisible(false);
         table = new JTable();
@@ -138,11 +128,34 @@ public class GUI {
                 searchField.requestFocus();
             }
         });
+        fc.setDialogType(JFileChooser.OPEN_DIALOG);
+        fc.setDialogTitle("Adatbázis választó");
+        fc.setApproveButtonText("Kiválaszt");
+        fc.setMultiSelectionEnabled(false);
+        fc.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return file.getName().endsWith("xlsx") || file.getName().endsWith("ods") || file.isDirectory();
+            }
+
+            @Override
+            public String getDescription() {
+                return "Ecxel & ODS táblázatok";
+            }
+        });
+        UIManager.put("FileChooser.lookInLabelText", "Mappa:");
+        UIManager.put("FileChooser.cancelButtonText", "Mégse");
+        UIManager.put("FileChooser.fileNameLabelText", "Fájlnév:");
+        UIManager.put("FileChooser.filesOfTypeLabelText", "Fájl fajta:");
+        UIManager.put("FileChooser.upFolderToolTipText", "Fel");
+        UIManager.put("FileChooser.homeFolderToolTipText", "Asztal");
+        UIManager.put("FileChooser.newFolderToolTipText", "Új mappa készítése");
+        UIManager.put("FileChooser.listViewButtonToolTipText", "Lista");
+        UIManager.put("FileChooser.detailsViewButtonToolTipText", "Részletek");
+        SwingUtilities.updateComponentTreeUI(fc);
         TablePanel.add(scrollPane);
-        megtek.addActionListener(actionEvent -> {
-            CardLayout c = (CardLayout) FRAME.getLayout();
-            c.show(FRAME, "DataBaseAddPanel");
-            twoInPanel.add(Notific, BorderLayout.SOUTH);
+        AddDataBase.addActionListener(actionEvent -> {
+            addDataBase();
         });
         list = new JList(dataa);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -282,113 +295,6 @@ public class GUI {
         Gomb2Panel.add(excel);
         Gomb2Panel.add(ods);
         Gomb2Panel.add(createTable);
-        final JTextField DataBasePathField = new JTextField();
-        DataBasePathField.setDropTarget(new DropTarget() {
-            public synchronized void drop(DropTargetDropEvent evt) {
-                try {
-                    evt.acceptDrop(DnDConstants.ACTION_COPY);
-                    List<File> dropped = (List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-                    for (File file : dropped) {
-                        DataBasePathField.setText(file.getAbsolutePath());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        twoInMidPanel.add(DataBasePathField, BorderLayout.NORTH);
-        visszaButton.addActionListener(actionEvent -> {
-            CardLayout c = (CardLayout) FRAME.getLayout();
-            c.show(FRAME, "MainPanel");
-            TablePanel.add(Notific, BorderLayout.SOUTH);
-            for (int i = table.getRowCount() - 1; i >= 0; i--) {
-                ((DefaultTableModel) table.getModel()).removeRow(i);
-            }
-            DefaultTableModel modelll = (DefaultTableModel) table.getModel();
-
-            for (Data d : data) {
-                modelll.addRow(new Object[]{d.getIndex(), d.getCS(), d.getCN(), (int) d.getMin()});
-            }
-        });
-        DataBaseAddBut.addActionListener(actionEvent -> {
-            String path = DataBasePathField.getText();
-            if (path.isEmpty()) {
-                hibaShow.show(Color.red, "Nem írtál be semmit!", true);
-            }
-            String[] tmp = path.split("[.]");
-            final boolean[] good = {false};
-            final boolean[] runs = {false};
-            Thread be;
-            if (tmp[tmp.length - 1].startsWith("ods")) {
-                be = new Thread(() -> {
-                    try {
-                        runs[0] = true;
-                        hibaShow.show(Color.green, "Beolvasás...", false);
-                        DataBaseAddBut.setEnabled(false);
-                        visszaButton.setEnabled(false);
-                        data = ExcelInterface.getDataFromOds(path);
-                        DataBaseAddBut.setEnabled(true);
-                        visszaButton.setEnabled(true);
-                        hibaShow.show(Color.green, "Beolvasás kész!", true);
-                        good[0] = true;
-                        runs[0] = false;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (IndexOutOfBoundsException e) {
-                        hibaShow.show(Color.red, "Nem Megendett fájl!", true);
-                        DataBaseAddBut.setEnabled(true);
-                        visszaButton.setEnabled(true);
-                    }
-                });
-                be.start();
-            } else if (tmp[tmp.length - 1].startsWith("xls")) {
-                be = new Thread(() -> {
-                    try {
-                        runs[0] = true;
-                        hibaShow.show(Color.green, "Beolvasás...", false);
-                        DataBaseAddBut.setEnabled(false);
-                        visszaButton.setEnabled(false);
-                        data = ExcelInterface.getDatafromXls(path);
-                        DataBaseAddBut.setEnabled(true);
-                        visszaButton.setEnabled(true);
-                        hibaShow.show(Color.green, "Beolvasás kész!", true);
-                        good[0] = true;
-                        runs[0] = false;
-                    } catch (IOException | InvalidFormatException e) {
-                        e.printStackTrace();
-                    } catch (IndexOutOfBoundsException e) {
-                        hibaShow.show(Color.red, "Nem Megendett fájl!", true);
-                        DataBaseAddBut.setEnabled(true);
-                        visszaButton.setEnabled(true);
-                    }
-                });
-                be.start();
-            } else {
-                hibaShow.show(Color.red, "Nem Megendett fájl!", true);
-            }
-            Thread ment = new Thread(() -> {
-                while (runs[0]) {
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    if (!runs[0]) break;
-                }
-                if (good[0]) {
-                    try {
-                        FileOutputStream saveFile = new FileOutputStream("Save.sav");
-                        ObjectOutputStream save = new ObjectOutputStream(saveFile);
-                        save.writeObject(path);
-                        save.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            ment.start();
-            DataBasePathField.setText("");
-        });
         searchField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent keyEvent) {
@@ -517,7 +423,7 @@ public class GUI {
                 try {
                     TablePanel.setVisible(true);
                     table.setVisible(false);
-                    megtek.setEnabled(false);
+                    AddDataBase.setEnabled(false);
                     search.setEnabled(false);
                     valt.setEnabled(false);
                     searchField.setEnabled(false);
@@ -537,7 +443,7 @@ public class GUI {
                         modell.addRow(new Object[]{d.getIndex(), d.getCS(), d.getCN(), (int) d.getMin()});
                     }
                     hibaShow.show(Color.green, "Betöltés kész!", true);
-                    megtek.setEnabled(true);
+                    AddDataBase.setEnabled(true);
                     search.setEnabled(true);
                     valt.setEnabled(true);
                     searchField.setEnabled(true);
@@ -548,17 +454,120 @@ public class GUI {
             });
             t.start();
         } else {
-            CardLayout c = (CardLayout) FRAME.getLayout();
-            c.show(FRAME, "DataBaseAddPanel");
-            twoInPanel.add(Notific, BorderLayout.SOUTH);
             hibaShow.show(Color.red, "Nincs hozzá adva megfelelő adatbázis!", true);
-            megtek.setEnabled(true);
-            search.setEnabled(true);
-            valt.setEnabled(true);
+            AddDataBase.setEnabled(false);
+            search.setEnabled(false);
+            valt.setEnabled(false);
             searchField.setEnabled(true);
             table.setVisible(true);
+            table.setEnabled(false);
             TablePanel.setVisible(true);
+            new Thread(() -> {
+                addDataBase();
+            }).start();
         }
+    }
+
+    private void addDataBase() {
+        int retVal = fc.showOpenDialog(GUI.this);
+        if (retVal != JFileChooser.APPROVE_OPTION && baseDataPath == null) {
+            hibaShow.show(Color.red, "Nem adtál hozzá megfelelő adatbázist!", true);
+            return;
+        }
+        if (retVal != JFileChooser.APPROVE_OPTION) return;
+        File chosenFile = fc.getSelectedFile();
+        String path = chosenFile.getAbsolutePath();
+        String[] tmp = path.split("[.]");
+        final boolean[] good = {false};
+        final boolean[] runs = {false};
+        Thread be;
+        if (tmp[tmp.length - 1].startsWith("ods")) {
+            be = new Thread(() -> {
+                try {
+                    runs[0] = true;
+                    AddDataBase.setEnabled(false);
+                    hibaShow.show(Color.green, "Beolvasás...", false);
+                    data = ExcelInterface.getDataFromOds(path);
+                    hibaShow.show(Color.green, "Beolvasás kész!", true);
+                    good[0] = true;
+                    runs[0] = false;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (IndexOutOfBoundsException e) {
+                    hibaShow.show(Color.red, "Nem Megendett fájl!", true);
+                    AddDataBase.setEnabled(true);
+                }
+            });
+            be.start();
+        } else if (tmp[tmp.length - 1].startsWith("xls")) {
+            be = new Thread(() -> {
+                try {
+                    runs[0] = true;
+                    AddDataBase.setEnabled(false);
+                    hibaShow.show(Color.green, "Beolvasás...", false);
+                    data = ExcelInterface.getDatafromXls(path);
+                    hibaShow.show(Color.green, "Beolvasás kész!", true);
+                    good[0] = true;
+                    runs[0] = false;
+                    AddDataBase.setEnabled(true);
+                } catch (IOException | InvalidFormatException e) {
+                    e.printStackTrace();
+                } catch (IndexOutOfBoundsException | NullPointerException e) {
+                    hibaShow.show(Color.red, "Nem Megendett fájl!", true);
+                    AddDataBase.setEnabled(true);
+                }
+            });
+            be.start();
+        } else {
+            hibaShow.show(Color.red, "Nem Megendett fájl!", true);
+        }
+        Thread ment = new Thread(() -> {
+            while (runs[0]) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (!runs[0]) break;
+            }
+            if (good[0]) {
+                try {
+                    FileOutputStream saveFile = new FileOutputStream("Save.sav");
+                    ObjectOutputStream save = new ObjectOutputStream(saveFile);
+                    save.writeObject(path);
+                    save.close();
+                    baseDataPath = path;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        Thread show = new Thread(() -> {
+            while (runs[0]) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (!runs[0]) break;
+            }
+            if (good[0]) {
+                for (int i = table.getRowCount() - 1; i >= 0; i--) {
+                    ((DefaultTableModel) table.getModel()).removeRow(i);
+                }
+                DefaultTableModel modelll = (DefaultTableModel) table.getModel();
+
+                for (Data d : data) {
+                    modelll.addRow(new Object[]{d.getIndex(), d.getCS(), d.getCN(), (int) d.getMin()});
+                }
+            }
+            table.setEnabled(true);
+            search.setEnabled(true);
+            valt.setEnabled(true);
+            AddDataBase.setEnabled(true);
+        });
+        ment.start();
+        show.start();
     }
 
     /**
@@ -577,9 +586,9 @@ public class GUI {
         GombPanel = new JPanel();
         GombPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
         MainPanel.add(GombPanel, BorderLayout.NORTH);
-        megtek = new JButton();
-        megtek.setText("Adatbázis modosítás");
-        GombPanel.add(megtek);
+        AddDataBase = new JButton();
+        AddDataBase.setText("Adatbázis modosítás");
+        GombPanel.add(AddDataBase);
         search = new JButton();
         search.setText("Keresés");
         GombPanel.add(search);
@@ -615,38 +624,6 @@ public class GUI {
         BefTablePanel.setLayout(new BorderLayout(0, 0));
         BefPanel.add(BefTablePanel, BorderLayout.CENTER);
         BefTablePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10), null));
-        DataBaseAddPanel = new JPanel();
-        DataBaseAddPanel.setLayout(new BorderLayout(5, 5));
-        FRAME.add(DataBaseAddPanel, "DataBaseAddPanel");
-        GombPanel3 = new JPanel();
-        GombPanel3.setLayout(new BorderLayout(5, 5));
-        DataBaseAddPanel.add(GombPanel3, BorderLayout.NORTH);
-        GombPanel3.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10), null));
-        visszaButton = new JButton();
-        visszaButton.setText("<<Vissza<<");
-        GombPanel3.add(visszaButton, BorderLayout.WEST);
-        twoInPanel = new JPanel();
-        twoInPanel.setLayout(new BorderLayout(0, 0));
-        DataBaseAddPanel.add(twoInPanel, BorderLayout.CENTER);
-        twoInPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(10, 5, 0, 10), null));
-        twoInLeftPanel = new JPanel();
-        twoInLeftPanel.setLayout(new BorderLayout(0, 0));
-        twoInPanel.add(twoInLeftPanel, BorderLayout.WEST);
-        twoInLeftPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), null));
-        hozLab = new JLabel();
-        hozLab.setText("Hozzáadandó fájl:");
-        twoInLeftPanel.add(hozLab, BorderLayout.NORTH);
-        twoInMidPanel = new JPanel();
-        twoInMidPanel.setLayout(new BorderLayout(0, 0));
-        twoInPanel.add(twoInMidPanel, BorderLayout.CENTER);
-        twoInMidPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(5, 0, 5, 5), null));
-        twoInRightPanel = new JPanel();
-        twoInRightPanel.setLayout(new BorderLayout(0, 0));
-        twoInPanel.add(twoInRightPanel, BorderLayout.EAST);
-        twoInRightPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(0, 0, 5, 5), null));
-        DataBaseAddBut = new JButton();
-        DataBaseAddBut.setText("Hozzáadás");
-        twoInRightPanel.add(DataBaseAddBut, BorderLayout.NORTH);
     }
 
     /**
@@ -797,28 +774,4 @@ public class GUI {
             menu.show(e.getComponent(), e.getX(), e.getY());
         }
     }
-
-/*    class DoubleClickListener {
-
-        private int numOfClicks;
-        private long clickTime;
-
-        DoubleClickListener() {
-            this.numOfClicks = 0;
-            this.clickTime = 0;
-        }
-
-        public boolean isDoubleClicked() {
-            numOfClicks++;
-            if (System.currentTimeMillis() - clickTime > 1000) {
-                numOfClicks = 0;
-            }
-            if (numOfClicks >= 1) {
-                return true;
-            }
-            clickTime = System.currentTimeMillis();
-            return false;
-        }
-
-    }*/
 }
