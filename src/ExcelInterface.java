@@ -13,7 +13,7 @@ import java.util.List;
 
 class ExcelInterface {
 
-    static List<Data> getDatafromXls(String file_path) throws IOException, InvalidFormatException {
+    static List<Data> getDatafromXls(String file_path) throws IOException, InvalidFormatException, NullPointerException {
         InputStream inp = new FileInputStream(file_path);
         Workbook wb = WorkbookFactory.create(inp);
         Sheet sheet = wb.getSheetAt(0);
