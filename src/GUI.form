@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="GUI">
+  <grid id="ea6d8" binding="FRAME" layout-manager="CardLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <grid id="8642f" binding="MainPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints>
+          <card name="MainPanel"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="9eb17" binding="GombPanel" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+            <constraints border-constraint="North"/>
+            <properties/>
+            <border type="none" title-justification="1" title-position="2"/>
+            <children>
+              <component id="3f909" class="javax.swing.JButton" binding="megtek">
+                <constraints/>
+                <properties>
+                  <text value="Adatbázis modosítás"/>
+                </properties>
+              </component>
+              <component id="b1251" class="javax.swing.JButton" binding="search">
+                <constraints/>
+                <properties>
+                  <text value="Keresés"/>
+                </properties>
+              </component>
+              <component id="553fe" class="javax.swing.JTextField" binding="searchField">
+                <constraints/>
+                <properties>
+                  <preferredSize width="100" height="20"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <grid id="4322f" binding="TablePanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints border-constraint="Center"/>
+            <properties/>
+            <border type="empty">
+              <size top="10" left="10" bottom="0" right="10"/>
+            </border>
+            <children>
+              <grid id="c96a2" binding="Notific" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints border-constraint="South"/>
+                <properties>
+                  <background color="-5855578"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <component id="4ac04" class="javax.swing.JLabel" binding="hibaText">
+                    <constraints border-constraint="Center"/>
+                    <properties>
+                      <background color="-6447715"/>
+                      <enabled value="true"/>
+                      <font name="Monospaced" size="20" style="1"/>
+                      <foreground color="-65536"/>
+                      <horizontalAlignment value="0"/>
+                      <horizontalTextPosition value="4"/>
+                      <text value="Label"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+            </children>
+          </grid>
+        </children>
+      </grid>
+      <grid id="cde89" binding="BefPanel" layout-manager="BorderLayout" hgap="5" vgap="5">
+        <constraints>
+          <card name="BefPanel"/>
+        </constraints>
+        <properties/>
+        <border type="none">
+          <title-color color="-16777216"/>
+        </border>
+        <children>
+          <grid id="ff96" binding="Gomb2Panel" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="0">
+            <constraints border-constraint="North"/>
+            <properties/>
+            <border type="empty">
+              <size top="5" left="5" bottom="5" right="5"/>
+            </border>
+            <children/>
+          </grid>
+          <grid id="893b7" binding="BefTablePanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints border-constraint="Center"/>
+            <properties/>
+            <border type="empty">
+              <size top="10" left="10" bottom="0" right="10"/>
+            </border>
+            <children/>
+          </grid>
+        </children>
+      </grid>
+      <grid id="79262" binding="DataBaseAddPanel" layout-manager="BorderLayout" hgap="5" vgap="5">
+        <constraints>
+          <card name="DataBaseAddPanel"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="86f35" binding="GombPanel3" layout-manager="BorderLayout" hgap="5" vgap="5">
+            <constraints border-constraint="North"/>
+            <properties/>
+            <border type="empty">
+              <size top="10" left="10" bottom="10" right="10"/>
+            </border>
+            <children>
+              <component id="46f45" class="javax.swing.JButton" binding="visszaButton" default-binding="true">
+                <constraints border-constraint="West"/>
+                <properties>
+                  <text value="&lt;&lt;Vissza&lt;&lt;"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <grid id="ded93" binding="twoInPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints border-constraint="Center"/>
+            <properties/>
+            <border type="empty">
+              <size top="10" left="5" bottom="0" right="10"/>
+            </border>
+            <children>
+              <grid id="3faaa" binding="twoInLeftPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints border-constraint="West"/>
+                <properties/>
+                <border type="empty">
+                  <size top="5" left="5" bottom="5" right="5"/>
+                </border>
+                <children>
+                  <component id="6fc5" class="javax.swing.JLabel" binding="hozLab">
+                    <constraints border-constraint="North"/>
+                    <properties>
+                      <text value="Hozzáadandó fájl:"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <grid id="788cc" binding="twoInMidPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints border-constraint="Center"/>
+                <properties/>
+                <border type="empty">
+                  <size top="5" left="0" bottom="5" right="5"/>
+                </border>
+                <children/>
+              </grid>
+              <grid id="5943c" binding="twoInRightPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints border-constraint="East"/>
+                <properties/>
+                <border type="empty">
+                  <size top="0" left="0" bottom="5" right="5"/>
+                </border>
+                <children>
+                  <component id="1c122" class="javax.swing.JButton" binding="DataBaseAddBut">
+                    <constraints border-constraint="North"/>
+                    <properties>
+                      <text value="Hozzáadás"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+            </children>
+          </grid>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>
