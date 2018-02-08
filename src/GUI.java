@@ -81,6 +81,7 @@ public class GUI extends Component {
             @Override
             public void keyPressed(KeyEvent keyEvent) {
                 super.keyPressed(keyEvent);
+                DefaultTableModel modell = (DefaultTableModel) table.getModel();
                 if (keyEvent.getExtendedKeyCode() == 10 && numberOfFound == 1) {
                     int selected = (int) table.getModel().getValueAt(0, 0);
                     if (valasztottB == 0) {
@@ -93,7 +94,6 @@ public class GUI extends Component {
                         if (!inAlready) {
                             bajcsa.add(new Data(data.get(selected).getCC(), data.get(selected).getCS(), data.get(selected).getCN(), data.get(selected).getMin(), data.get(selected).getME(), data.get(selected).getAfa(), data.get(selected).getMA()));
                             hibaShow.show(Color.green, "Hozzáadva ide: Bajcsa", true);
-                            DefaultTableModel modell = (DefaultTableModel) table.getModel();
                             for (int i = table.getRowCount() - 1; i >= 0; i--) {
                                 modell.removeRow(i);
                             }
@@ -102,6 +102,14 @@ public class GUI extends Component {
                             }
                         } else {
                             hibaShow.show(Color.red, "Ezt már hozzáadtad!", true);
+                            for (int i = table.getRowCount() - 1; i >= 0; i--) {
+                                modell.removeRow(i);
+                            }
+                            for (Data d : data) {
+                                modell.addRow(new Object[]{d.getIndex(), d.getCS(), d.getCN(), (int) d.getMin()});
+
+
+                            }
                         }
                     } else if (valasztottB == 1) {
                         boolean inAlready = false;
@@ -113,7 +121,6 @@ public class GUI extends Component {
                         if (!inAlready) {
                             keresztur.add(new Data(data.get(selected).getCC(), data.get(selected).getCS(), data.get(selected).getCN(), data.get(selected).getMin(), data.get(selected).getME(), data.get(selected).getAfa(), data.get(selected).getMA()));
                             hibaShow.show(Color.green, "Hozzáadva ide: Múrakeresztúr", true);
-                            DefaultTableModel modell = (DefaultTableModel) table.getModel();
                             for (int i = table.getRowCount() - 1; i >= 0; i--) {
                                 modell.removeRow(i);
                             }
@@ -122,6 +129,12 @@ public class GUI extends Component {
                             }
                         } else {
                             hibaShow.show(Color.red, "Ezt már hozzáadtad!", true);
+                            for (int i = table.getRowCount() - 1; i >= 0; i--) {
+                                modell.removeRow(i);
+                            }
+                            for (Data d : data) {
+                                modell.addRow(new Object[]{d.getIndex(), d.getCS(), d.getCN(), (int) d.getMin()});
+                            }
                         }
                     }
                 }
