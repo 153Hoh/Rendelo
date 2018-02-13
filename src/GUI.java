@@ -240,9 +240,9 @@ public class GUI extends Component {
         });
         JCheckBox excel = new JCheckBox();
         excel.setText("Excel");
-        excel.setSelected(true);
         JCheckBox ods = new JCheckBox();
         ods.setText("OpenS");
+        ods.setSelected(true);
         JButton createTable = new JButton("Rendelés készítése");
         createTable.addActionListener(actionEvent -> {
             if (valasztottB == 0) {
